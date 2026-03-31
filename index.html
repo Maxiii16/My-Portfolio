@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <!-- ✏️ PAGE TITLE — change if needed -->
+  <title>Safin Yasar — Portfolio</title>
+
+  <!-- FONTS: Playfair Display (serif/poetic), Inter (body), JetBrains Mono (code) -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* ═══════════════════════════════════════════════════════
+       DESIGN TOKENS — edit colours here to retheme everything
+    ═══════════════════════════════════════════════════════ */
+
+    /* ── DARK MODE (default) ─────────────────────────────── */
+    :root {
+      --bg:            #0a0a0a;
+      --bg-alt:        rgba(255,255,255,0.02);
+      --ink:           #f5f5f5;
+      --muted:         #888888;
+      --accent-blue:   #3b82f6;   /* ✏️ blue accent */
+      --accent-purple: #8b5cf6;   /* ✏️ purple accent */
+      --glass-bg:      rgba(255,255,255,0.05);
+      --glass-border:  rgba(255,255,255,0.10);
+      --nav-scrolled:  rgba(10,10,10,0.85);
+      --nav-border:    rgba(255,255,255,0.05);
+      --timeline-line: rgba(255,255,255,0.08);
+      --font-serif:    'Playfair Display', serif;
+      --font-sans:     'Inter', sans-serif;
+      --font-mono:     'JetBrains Mono', monospace;
+    }
+
+    /* ── LIGHT MODE — warm cream / paper white ───────────── */
+    /* ✏️ Tweak these hex values to adjust the light mode feel */
+    html.light {
+      --bg:            #faf7f2;
+      --bg-alt:        rgba(0,0,0,0.025);
+      --ink:           #1a1a1a;
+      --muted:         #6b6b6b;
+      --accent-blue:   #2563eb;
+      --accent-purple: #7c3aed;
+      --glass-bg:      rgba(0,0,0,0.035);
+      --glass-border:  rgba(0,0,0,0.10);
+      --nav-scrolled:  rgba(250,247,242,0.92);
+      --nav-border:    rgba(0,0,0,0.08);
+      --timeline-line: rgba(0,0,0,0.10);
+    }
+
+    /* smooth colour transition when toggling theme */
+    body, nav, section, footer, .glass, .stat, .edu-card,
+    .project-card, .skill-group-title, .timeline::before,
+    .cv-card, .contact-link-icon, .social-btn {
+      transition: background-color 0.45s ease, border-color 0.45s ease,
+                  color 0.45s ease, box-shadow 0.45s ease !important;
+    }
+
+    /* ══════════════════════════════════════════════════════
+       THEME TOGGLE BUTTON
+    ══════════════════════════════════════════════════════ */
+    /* ✏️ Toggle sits in the navbar top-right — style here */
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 999px;
+      padding: 0.4rem 0.9rem;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      flex-shrink: 0;
+      outline: none;
+    }
+    .theme-toggle:hover { color: var(--ink); border-color: var(--accent-blue); }
+    .theme-toggle-icon { font-size: 1rem; line-height: 1; }
+    /* sun shown in dark mode, moon in light mode */
+    .icon-sun  { display: block; }
+    .icon-moon { display: none; }
+    html.light .icon-sun  { display: none; }
+    html.light .icon-moon { display: block; }
+
+    /* ══════════════════════════════════════════════════════
+       CERTIFICATE LIGHTBOX
+    ══════════════════════════════════════════════════════ */
+    /* ✏️ Lightbox overlay — appears when "View Certificate" is clicked */
+    .lightbox-overlay {
+      position: fixed; inset: 0;
+      z-index: 200;
+      background: rgba(0,0,0,0.88);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+    .lightbox-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .lightbox-inner {
+      position: relative;
+      max-width: 820px;
+      width: 100%;
+      border-radius: 18px;
+      overflow: hidden;
+      transform: scale(0.92);
+      transition: transform 0.35s ease;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+    }
+    .lightbox-overlay.open .lightbox-inner { transform: scale(1); }
+    .lightbox-inner img {
+      width: 100%;
+      display: block;
+      border-radius: 18px;
+    }
+    /* placeholder shown if cert image is missing */
+    .lightbox-placeholder {
+      background: #111;
+      border: 1px dashed rgba(59,130,246,0.4);
+      border-radius: 18px;
+      padding: 5rem 3rem;
+      text-align: center;
+      color: #888;
+      font-family: var(--font-sans);
+    }
+    .lightbox-placeholder strong { color: #3b82f6; display: block; margin-top: 0.5rem; font-size: 0.85rem; }
+    .lightbox-close {
+      position: absolute;
+      top: 1rem; right: 1rem;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.6);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #fff;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      line-height: 1;
+      transition: background 0.2s;
+    }
+    .lightbox-close:hover { background: rgba(59,130,246,0.5); }
+
+    /* ── "View Certificate" link inside timeline ─────────── */
+    .cert-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      margin-top: 0.9rem;
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent-blue);
+      cursor: pointer;
+      border: 1px solid rgba(59,130,246,0.3);
+      border-radius: 999px;
+      padding: 0.3rem 0.9rem;
+      background: rgba(59,130,246,0.06);
+      transition: all 0.25s;
+      font-family: var(--font-sans);
+      font-weight: 500;
+    }
+    .cert-link:hover {
+      background: rgba(59,130,246,0.14);
+      border-color: var(--accent-blue);
+      transform: translateX(2px);
+    }
+    .cert-link-icon { font-size: 0.85rem; }
+
+    /* ── RESET ───────────────────────────────────────────── */
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      font-weight: 300;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; }
+
+    /* ── GRAIN TEXTURE OVERLAY ───────────────────────────── */
+    .grain {
+      position: fixed; inset: 0;
+      pointer-events: none;
+      z-index: 50;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* ── GLASS CARD UTILITY ──────────────────────────────── */
+    .glass {
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+    }
+
+    /* ══════════════════════════════════════════════════════
+       NAVBAR
+    ══════════════════════════════════════════════════════ */
+    nav {
+      position: fixed; top:0; left:0; width:100%;
+      z-index: 40;
+      padding: 2rem 6%;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      transition: all 0.5s;
+    }
+    /* logo snaps left, links truly centered, toggle snaps right */
+    nav .nav-logo     { justify-self: start; }
+    nav .nav-links    { justify-self: center; }
+    nav .theme-toggle { justify-self: end; }
+    nav.scrolled {
+      padding: 1.2rem 6%;
+      background: var(--nav-scrolled);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--nav-border);
+    }
+
+    /* ✏️ LOGO — full name top-left */
+    .nav-logo {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 1.25rem;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      white-space: nowrap;
+    }
+    /* "Safin" normal weight, "Yasar" bold for visual interest */
+    .nav-logo .logo-last { font-weight: 700; }
+    .nav-logo:hover { opacity: 0.7; }
+
+    .nav-links {
+      display: flex; gap: 2.5rem;
+      list-style: none;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      font-weight: 500;
+      color: var(--muted);
+    }
+    .nav-links a { transition: color 0.3s; }
+    .nav-links a:hover { color: var(--ink); }
+
+    /* ══════════════════════════════════════════════════════
+       HERO SECTION
+    ══════════════════════════════════════════════════════ */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 6rem 6% 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ambient glow blobs */
+    .hero-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      animation: pulse 4s ease-in-out infinite alternate;
+    }
+    .blob-blue  { width:55%; height:50%; top:20%; left:-20%;  background: rgba(59,130,246,0.10); }
+    .blob-purple{ width:55%; height:50%; bottom:20%; right:-20%; background: rgba(139,92,246,0.10); animation-delay:-2s; }
+    @keyframes pulse { from{opacity:.7} to{opacity:1} }
+
+    .hero-inner { position: relative; z-index: 1; }
+
+    /* ✏️ HERO EYEBROW — small top label */
+    .hero-eyebrow {
+      font-size: 0.72rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      font-weight: 500;
+      color: var(--accent-blue);
+      margin-bottom: 1.8rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.3s;
+    }
+
+    /* ✏️ HERO HEADLINE — main name/tagline */
+    .hero-h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(3rem, 9vw, 7rem);
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.5s;
+    }
+    .hero-h1 em { font-style: italic; }
+    .hero-h1 .blue { color: var(--accent-blue); }
+
+    /* ✏️ HERO SUBTITLE */
+    .hero-sub {
+      color: var(--muted);
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      font-weight: 300;
+      max-width: 520px;
+      line-height: 1.8;
+      letter-spacing: 0.03em;
+      margin: 0 auto 3rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.7s;
+    }
+
+    /* ✏️ HERO CTA BUTTON */
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 1rem 2rem;
+      background: var(--ink);
+      color: var(--bg);
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      transition: all 0.3s;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.9s;
+    }
+    .hero-cta:hover { background: var(--accent-blue); color: #fff; transform: scale(1.04); }
+    .hero-cta svg { width:16px; height:16px; transition: transform 0.3s; }
+    .hero-cta:hover svg { transform: translateX(3px); }
+
+    /* scroll indicator */
+    .scroll-line {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1px; height: 48px;
+      background: linear-gradient(to bottom, var(--ink), transparent);
+      opacity: 0.3;
+      animation: scrollBob 2s ease-in-out infinite;
+    }
+    @keyframes scrollBob { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(8px)} }
+
+    @keyframes fadeUp {
+      from { opacity:0; transform: translateY(20px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+
+    /* ══════════════════════════════════════════════════════
+       SHARED SECTION STYLES
+    ══════════════════════════════════════════════════════ */
+    section { padding: 8rem 6%; }
+    .section-alt { background: var(--bg-alt); }
+
+    .section-eyebrow {
+      font-size: 0.7rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--accent-blue);
+      font-weight: 500;
+      margin-bottom: 1rem;
+      display: block;
+    }
+    .section-h2 {
+      font-family: var(--font-serif);
+      font-size: clamp(2.2rem, 5vw, 4rem);
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+    }
+    .section-h2 em { font-style: italic; }
+
+    /* ── REVEAL ANIMATION (triggered by JS) ─────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-x {
+      opacity: 0;
+      transform: translateX(-40px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .reveal-x.visible { opacity:1; transform:translateX(0); }
+
+    /* ══════════════════════════════════════════════════════
+       ABOUT SECTION
+    ══════════════════════════════════════════════════════ */
+    #about .about-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+      align-items: center;
+    }
+
+    /* ✏️ ABOUT — heading and paragraphs */
+    .about-text p {
+      color: var(--muted);
+      line-height: 1.9;
+      font-size: 1.05rem;
+      margin-bottom: 1.4rem;
+    }
+    .about-text strong { color: var(--ink); font-weight: 500; }
+
+    /* ✏️ ABOUT — poetic quote */
+    .about-quote {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 1.15rem;
+      color: var(--ink);
+      margin-top: 1.8rem;
+      padding-left: 1.2rem;
+      border-left: 2px solid var(--accent-blue);
+      line-height: 1.7;
+    }
+
+    /* ✏️ PHOTO — place your photo file (named safin-photo.jpg) in the same folder as this HTML file
+       The photo appears in the About section, right side */
+    .photo-frame {
+      position: relative;
+      width: 260px;
+      height: 300px;
+      margin: 0 auto;
+    }
+    .photo-frame-glow {
+      position: absolute;
+      inset: -20px;
+      background: radial-gradient(circle, rgba(59,130,246,0.15), transparent 70%);
+      border-radius: 50%;
+      filter: blur(30px);
+      animation: pulse 4s ease-in-out infinite;
+    }
+    .photo-img {
+      position: relative;
+      z-index: 1;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.12);
+      display: block;
+    }
+    /* shown when photo file is missing */
+    .photo-placeholder {
+      position: relative;
+      z-index: 1;
+      width: 100%; height: 100%;
+      border-radius: 20px;
+      border: 1px dashed rgba(59,130,246,0.4);
+      background: rgba(59,130,246,0.04);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.8rem;
+      color: var(--muted);
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-align: center;
+      padding: 1rem;
+    }
+    .photo-placeholder-icon { font-size: 3rem; opacity: 0.3; }
+    .photo-placeholder-hint { font-size: 0.68rem; color: var(--accent-blue); opacity: 0.7; }
+
+    /* stats row under visual */
+    .about-stats {
+      display: grid;
+      grid-template-columns: repeat(2,1fr);
+      gap: 1rem;
+      margin-top: 2rem;
+      position: relative;
+      z-index: 2;
+      width: 100%;
+    }
+    .stat {
+      padding: 1.2rem;
+      border: 1px solid var(--glass-border);
+      border-radius: 14px;
+      background: var(--glass-bg);
+      text-align: center;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+    .stat:hover { border-color: rgba(59,130,246,0.4); transform: translateY(-3px); }
+    /* ✏️ STATS — numbers and labels */
+    .stat-num { font-family: var(--font-serif); font-size: 2rem; font-weight: 700; color: var(--accent-blue); }
+    .stat-label { font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-top: 0.2rem; }
+
+    /* ══════════════════════════════════════════════════════
+       EDUCATION SECTION
+    ══════════════════════════════════════════════════════ */
+    #education .edu-inner { max-width: 1200px; margin: 0 auto; }
+
+    /* ✏️ EDU CARDS — add/remove .edu-card blocks in HTML to update */
+    .edu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+    .edu-card {
+      padding: 2rem 2.2rem;
+      border-radius: 20px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s, border-color 0.3s;
+    }
+    .edu-card:hover { transform: translateY(-6px); border-color: rgba(59,130,246,0.4) !important; }
+    .edu-card-stripe {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s ease;
+    }
+    .edu-card:hover .edu-card-stripe { transform: scaleX(1); }
+    .edu-year {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent-blue);
+      margin-bottom: 0.8rem;
+    }
+    .edu-degree {
+      font-family: var(--font-serif);
+      font-size: 1.4rem;
+      margin-bottom: 0.4rem;
+      line-height: 1.2;
+    }
+    .edu-institution {
+      font-size: 0.85rem;
+      color: rgba(245,245,245,0.5);
+      margin-bottom: 1rem;
+    }
+    .edu-detail {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .edu-gpa {
+      display: inline-block;
+      margin-top: 1rem;
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.9rem;
+      border-radius: 999px;
+      background: rgba(59,130,246,0.1);
+      border: 1px solid rgba(59,130,246,0.3);
+      color: var(--accent-blue);
+      font-weight: 500;
+    }
+
+    /* ══════════════════════════════════════════════════════
+       PROJECTS SECTION
+    ══════════════════════════════════════════════════════ */
+    #projects .projects-inner { max-width: 1200px; margin: 0 auto; }
+
+    .projects-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 4rem;
+    }
+
+    /* ✏️ PROJECT CARDS — add/remove cards in JS data below */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+    .project-card {
+      padding: 2rem;
+      border-radius: 24px;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+    .project-card:hover { transform: translateY(-10px); }
+    .project-card-glow {
+      position: absolute;
+      top: 0; right: 0;
+      width: 8rem; height: 8rem;
+      border-radius: 50%;
+      filter: blur(48px);
+      transition: opacity 0.5s;
+    }
+    .project-card-glow.blue   { background: rgba(59,130,246,0.1); }
+    .project-card-glow.purple { background: rgba(139,92,246,0.1); }
+    .project-card:hover .project-card-glow { opacity: 2; }
+
+    .project-icon-wrap {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px; height: 48px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      margin-bottom: 2rem;
+      font-size: 1.4rem;
+    }
+    .project-title {
+      font-family: var(--font-serif);
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      transition: color 0.3s;
+    }
+    .project-card:hover .project-title { color: var(--accent-blue); }
+    .project-desc {
+      color: var(--muted);
+      font-size: 0.85rem;
+      line-height: 1.8;
+      margin-bottom: 1.5rem;
+    }
+    .project-bullets {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+    }
+    .project-bullets li {
+      font-size: 0.8rem;
+      color: var(--muted);
+      padding-left: 1rem;
+      position: relative;
+      line-height: 1.6;
+    }
+    .project-bullets li::before {
+      content: '▸';
+      position: absolute; left:0;
+      color: var(--accent-blue);
+      font-size: 0.65rem;
+      top: 0.2em;
+    }
+    .project-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 2rem; }
+    .project-tag {
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.8rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .project-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .project-explore {
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .project-card:hover .project-explore { opacity: 1; }
+
+    /* ══════════════════════════════════════════════════════
+       SKILLS SECTION
+    ══════════════════════════════════════════════════════ */
+    #skills .skills-inner { max-width: 1200px; margin: 0 auto; }
+    .skills-header { text-align: center; margin-bottom: 5rem; }
+    .skills-header p { color: var(--muted); max-width: 400px; margin: 0 auto; font-size: 0.95rem; line-height: 1.8; }
+
+    /* ✏️ SKILL GROUPS — edit titles and skills in JS data below */
+    .skills-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 4rem; }
+
+    .skill-group-title {
+      font-family: var(--font-serif);
+      font-size: 1.2rem;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding-bottom: 1rem;
+      margin-bottom: 2rem;
+    }
+    .skill-list { display: flex; flex-direction: column; gap: 1rem; }
+    .skill-item {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      color: var(--muted);
+      font-size: 0.95rem;
+      transition: color 0.3s;
+      cursor: default;
+    }
+    .skill-item:hover { color: var(--ink); }
+    .skill-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent-blue);
+      flex-shrink: 0;
+      transition: transform 0.3s;
+    }
+    .skill-item:hover .skill-dot { transform: scale(1.8); }
+
+    /* ══════════════════════════════════════════════════════
+       JOURNEY SECTION  (Education + Activities)
+    ══════════════════════════════════════════════════════ */
+    #journey .journey-inner { max-width: 720px; margin: 0 auto; }
+    .journey-header { text-align: center; margin-bottom: 5rem; }
+
+    /* ✏️ TIMELINE — add/remove steps in JS data below */
+    .timeline { position: relative; padding-left: 2rem; }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 1px;
+      background: var(--timeline-line);
+    }
+    .timeline-item { position: relative; margin-bottom: 4rem; padding-left: 2rem; }
+    .timeline-dot {
+      position: absolute;
+      left: -2.35rem; top: 0.3rem;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--accent-blue);
+      box-shadow: 0 0 0 4px var(--bg);
+    }
+    .timeline-year {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent-blue);
+      margin-bottom: 0.4rem;
+    }
+    .timeline-role {
+      font-family: var(--font-serif);
+      font-size: 1.5rem;
+      margin-bottom: 0.2rem;
+    }
+    .timeline-place {
+      font-size: 0.82rem;
+      color: rgba(245,245,245,0.4);
+      margin-bottom: 0.8rem;
+    }
+    .timeline-desc {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.8;
+    }
+    .timeline-badge {
+      display: inline-block;
+      margin-top: 0.6rem;
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.7rem;
+      border-radius: 999px;
+      background: rgba(59,130,246,0.1);
+      border: 1px solid rgba(59,130,246,0.25);
+      color: var(--accent-blue);
+    }
+
+    /* ══════════════════════════════════════════════════════
+       CONTACT SECTION
+    ══════════════════════════════════════════════════════ */
+    #contact .contact-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+    }
+
+    /* ✏️ CONTACT — left side heading and links */
+    .contact-h2 {
+      font-family: var(--font-serif);
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+    }
+    .contact-h2 em { font-style: italic; }
+    .contact-sub { color: var(--muted); font-size: 1rem; line-height: 1.8; margin-bottom: 3rem; }
+
+    .contact-link {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.2rem;
+      transition: color 0.3s;
+      font-size: 0.95rem;
+    }
+    .contact-link:hover { color: var(--accent-blue); }
+    .contact-link-icon {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      transition: all 0.3s;
+    }
+    .contact-link:hover .contact-link-icon {
+      background: rgba(59,130,246,0.1);
+      border-color: rgba(59,130,246,0.3);
+    }
+
+    /* ✏️ SOCIAL LINKS — GitHub and LinkedIn placeholders */
+    .social-row { display: flex; gap: 1rem; margin-top: 2.5rem; }
+    .social-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.9rem 1.4rem;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      font-size: 0.82rem;
+      transition: all 0.3s;
+      color: var(--muted);
+    }
+    .social-btn:hover { border-color: rgba(59,130,246,0.4); color: var(--ink); transform: translateY(-3px); }
+    .social-edit-hint { font-size: 0.6rem; color: var(--accent-purple); margin-left: 0.2rem; opacity: 0.8; }
+
+    /* contact right — CV download card */
+    .cv-card {
+      padding: 2.5rem;
+      border-radius: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 1.5rem;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+    .cv-card-glow {
+      position: absolute;
+      top:-40px; right:-40px;
+      width: 200px; height: 200px;
+      background: rgba(59,130,246,0.12);
+      border-radius: 50%;
+      filter: blur(60px);
+    }
+    .cv-card-title {
+      font-family: var(--font-serif);
+      font-size: 1.8rem;
+      position: relative;
+    }
+    .cv-card-sub { color: var(--muted); font-size: 0.88rem; line-height: 1.8; position: relative; }
+
+    /* ✏️ DOWNLOAD CV BUTTON — update href to your actual CV file path */
+    .btn-download {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 1rem 2rem;
+      background: var(--accent-blue);
+      color: #fff;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      transition: all 0.3s;
+      position: relative;
+      z-index: 1;
+      box-shadow: 0 8px 24px rgba(59,130,246,0.25);
+    }
+    .btn-download:hover { background: #2563eb; transform: translateY(-2px); box-shadow: 0 12px 32px rgba(59,130,246,0.35); }
+
+    /* ══════════════════════════════════════════════════════
+       FOOTER
+    ══════════════════════════════════════════════════════ */
+    footer {
+      padding: 3rem 6%;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    /* ✏️ FOOTER TEXT */
+    footer p { font-size: 0.8rem; color: var(--muted); }
+    .footer-links { display: flex; gap: 2rem; }
+    .footer-links a { font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); transition: color 0.3s; }
+    .footer-links a:hover { color: var(--ink); }
+
+    /* ── SCROLLBAR ───────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent-blue); }
+
+    /* ── RESPONSIVE ─────────────────────────────────────── */
+    @media (max-width: 768px) {
+      section { padding: 5rem 5%; }
+      #about .about-grid { grid-template-columns: 1fr; gap: 3rem; }
+      .skills-grid { grid-template-columns: 1fr; gap: 3rem; }
+      #contact .contact-inner { grid-template-columns: 1fr; gap: 3rem; }
+      .projects-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- grain texture overlay -->
+<div class="grain"></div>
+
+<!-- ══════════════════════════════════════════════════════
+     NAVBAR
+     ✏️ Edit nav links in the <ul> below
+════════════════════════════════════════════════════════ -->
+<nav id="navbar">
+  <!-- ✏️ LOGO — full name top left -->
+  <a href="#hero" class="nav-logo">Safin <span class="logo-last">Yasar</span></a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#education">Education</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#journey">Journey</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <!-- ✏️ THEME TOGGLE — sun/moon button top right -->
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle light/dark mode">
+    <span class="theme-toggle-icon icon-sun">☀️</span>
+    <span class="theme-toggle-icon icon-moon">🌙</span>
+  </button>
+</nav>
+
+<!-- ══════════════════════════════════════════════════════
+     HERO
+     ✏️ Edit headline, subtitle, and CTA text here
+════════════════════════════════════════════════════════ -->
+<section id="hero">
+  <div class="blob-blue hero-blob"></div>
+  <div class="blob-purple hero-blob"></div>
+
+  <div class="hero-inner">
+    <!-- ✏️ eyebrow line -->
+    <span class="hero-eyebrow">Welcome to my digital space</span>
+
+    <!-- ✏️ main headline -->
+    <h1 class="hero-h1">
+      I Build <em>Ideas</em><br/>
+      Into <span class="blue">Reality.</span>
+    </h1>
+
+    <!-- ✏️ subtitle -->
+    <p class="hero-sub">
+      Student. Creator. Problem Solver.<br/>
+      Crafting digital experiences with curiosity, precision, and a poetic touch.
+    </p>
+
+    <!-- ✏️ CTA button — href points to About section -->
+    <a href="#about" class="hero-cta">
+      Enter My World
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+
+  <div class="scroll-line"></div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     ABOUT
+     ✏️ Edit paragraphs, quote, and stat numbers below
+════════════════════════════════════════════════════════ -->
+<section id="about">
+  <div class="about-grid">
+
+    <!-- left: text -->
+    <div class="reveal reveal-x">
+      <span class="section-eyebrow">About Me</span>
+      <h2 class="section-h2">The Philosophy</h2>
+
+      <div class="about-text">
+        <!-- ✏️ paragraph 1 -->
+        <p>
+          I'm <strong>Safin Yasar</strong>, a <strong>Class 12 student</strong> at
+          Chattogram Collegiate College, pursuing my Higher Secondary Certificate.
+          I completed my SSC with a <strong>perfect GPA of 5.00</strong> — and I'm
+          just getting started.
+        </p>
+        <!-- ✏️ paragraph 2 -->
+        <p>
+          I believe technology is more than just logic — it's a medium for expression.
+          Whether I'm building a school website or designing an attendance tracker,
+          every project I take on has a purpose. I'm driven by <strong>curiosity</strong>,
+          disciplined by <strong>precision</strong>, and motivated by real-world impact.
+        </p>
+        <!-- ✏️ paragraph 3 -->
+        <p>
+          Beyond the screen, I organize quiz competitions, tutor classmates in computer
+          skills, and serve as a <strong>Campus Ambassador</strong> for the IAOC
+          National Math Olympiad 2026 — recognized for leadership and commitment.
+        </p>
+
+        <!-- ✏️ poetic quote — change anytime -->
+        <blockquote class="about-quote">
+          "In the intersection of curiosity and craft, we find the most meaningful creations."
+        </blockquote>
+      </div>
+    </div>
+
+    <!-- right: photo + stats -->
+    <div class="reveal reveal-delay-2" style="display:flex;flex-direction:column;align-items:center;gap:2rem;">
+
+      <!-- ✏️ PHOTO — name your photo file "safin-photo.jpg" and put it in the same folder -->
+      <div class="photo-frame">
+        <div class="photo-frame-glow"></div>
+        <!-- If your photo loads, it shows. If not, the placeholder shows. -->
+        <img
+          src="safin-photo.jpg"
+          alt="Safin Yasar"
+          class="photo-img"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+        />
+        <div class="photo-placeholder" style="display:none;">
+          <div class="photo-placeholder-icon">🧑‍💻</div>
+          <span>Your Photo Here</span>
+          <span class="photo-placeholder-hint">
+            ✏️ Name your photo<br/><strong>safin-photo.jpg</strong><br/>and place it in the same folder as this file
+          </span>
+        </div>
+      </div>
+
+      <!-- ✏️ STATS — edit numbers and labels -->
+      <div class="about-stats">
+        <div class="stat">
+          <div class="stat-num">5.00</div>
+          <div class="stat-label">SSC GPA</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">50+</div>
+          <div class="stat-label">WPM Typing</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">2</div>
+          <div class="stat-label">Projects Built</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">4+</div>
+          <div class="stat-label">Activities</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     EDUCATION
+     ✏️ Add/remove .edu-card blocks to update education entries
+════════════════════════════════════════════════════════ -->
+<section id="education" class="section-alt">
+  <div class="edu-inner">
+    <div class="reveal">
+      <span class="section-eyebrow">Academic Background</span>
+      <h2 class="section-h2">Education</h2>
+    </div>
+
+    <div class="edu-grid">
+
+      <!-- ✏️ EDU CARD 1 — current / most recent first -->
+      <div class="edu-card glass reveal reveal-delay-1">
+        <div class="edu-card-stripe"></div>
+        <!-- ✏️ year range -->
+        <div class="edu-year">2024 — 2026 (Expected)</div>
+        <!-- ✏️ degree name -->
+        <div class="edu-degree">Higher Secondary Certificate</div>
+        <!-- ✏️ institution -->
+        <div class="edu-institution">Chattogram Collegiate College</div>
+        <p class="edu-detail">
+          Currently pursuing HSC, building on a strong academic foundation
+          while developing hands-on skills in technology, web development,
+          and creative problem-solving.
+        </p>
+        <!-- ✏️ Remove the .edu-gpa span below if no GPA yet, or update when available -->
+        <span class="edu-gpa">In Progress</span>
+      </div>
+
+      <!-- ✏️ EDU CARD 2 -->
+      <div class="edu-card glass reveal reveal-delay-2">
+        <div class="edu-card-stripe"></div>
+        <!-- ✏️ year -->
+        <div class="edu-year">2024</div>
+        <!-- ✏️ degree name -->
+        <div class="edu-degree">Secondary School Certificate</div>
+        <!-- ✏️ institution -->
+        <div class="edu-institution">Housing and Settlement Public School</div>
+        <p class="edu-detail">
+          Completed SSC with a perfect academic record, demonstrating
+          consistent excellence in science, mathematics, and computer studies.
+        </p>
+        <!-- ✏️ GPA badge — update number or remove if not applicable -->
+        <span class="edu-gpa">🎓 GPA 5.00 / 5.00</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     PROJECTS
+     ✏️ To add a project: duplicate a .project-card block
+     ✏️ To remove: delete the block
+════════════════════════════════════════════════════════ -->
+<section id="projects" class="section-alt">
+  <div class="projects-inner">
+    <div class="projects-header reveal">
+      <div>
+        <span class="section-eyebrow">Selected Works</span>
+        <h2 class="section-h2">Creations</h2>
+      </div>
+    </div>
+
+    <div class="projects-grid">
+
+      <!-- ✏️ PROJECT 1 -->
+      <div class="project-card glass reveal reveal-delay-1">
+        <div class="project-card-glow blue"></div>
+        <div class="project-icon-wrap">🌐</div>
+        <h3 class="project-title">School Website Mockup</h3>
+        <ul class="project-bullets">
+          <li>Built a prototype website to showcase school events and notices using semantic HTML and organised CSS.</li>
+          <li>Structured pages for clear navigation — Home, Events, Announcements — designed for easy future expansion.</li>
+        </ul>
+        <div class="project-tags">
+          <span class="project-tag">HTML</span>
+          <span class="project-tag">CSS</span>
+        </div>
+        <div class="project-footer">
+          <span class="project-explore">Explore →</span>
+          <!-- ✏️ Replace # with actual project link when available -->
+          <a href="#" style="color:var(--muted);font-size:0.9rem;">↗</a>
+        </div>
+      </div>
+
+      <!-- ✏️ PROJECT 2 -->
+      <div class="project-card glass reveal reveal-delay-2">
+        <div class="project-card-glow purple"></div>
+        <div class="project-icon-wrap">📋</div>
+        <h3 class="project-title">Attendance Tracker</h3>
+        <ul class="project-bullets">
+          <li>Designed an Excel workbook with formulas to log daily attendance and auto-summarise per-student totals.</li>
+          <li>Used conditional formatting and dashboards to highlight absences at a glance.</li>
+        </ul>
+        <div class="project-tags">
+          <span class="project-tag">Microsoft Excel</span>
+          <span class="project-tag">Formulas</span>
+          <span class="project-tag">Dashboards</span>
+        </div>
+        <div class="project-footer">
+          <span class="project-explore">Explore →</span>
+          <!-- ✏️ Replace # with actual project link when available -->
+          <a href="#" style="color:var(--muted);font-size:0.9rem;">↗</a>
+        </div>
+      </div>
+
+      <!-- ✏️ PROJECT 3 PLACEHOLDER — delete this card or replace with a new project -->
+      <div class="project-card glass reveal reveal-delay-3" style="border-style:dashed;opacity:0.5;cursor:default;">
+        <div class="project-icon-wrap" style="opacity:0.4;">＋</div>
+        <h3 class="project-title" style="opacity:0.5;">Next Project</h3>
+        <p class="project-desc">Coming soon — something's brewing.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     SKILLS
+     ✏️ Edit skill group titles and skill items below
+════════════════════════════════════════════════════════ -->
+<section id="skills">
+  <div class="skills-inner">
+    <div class="skills-header reveal">
+      <span class="section-eyebrow">What I Know</span>
+      <h2 class="section-h2">The Toolkit</h2>
+      <p>A blend of technical ability and creative intuition — built through genuine curiosity.</p>
+    </div>
+
+    <div class="skills-grid">
+
+      <!-- ✏️ SKILL GROUP 1 -->
+      <div class="reveal reveal-delay-1">
+        <h3 class="skill-group-title">Technical</h3>
+        <div class="skill-list">
+          <div class="skill-item"><div class="skill-dot"></div>HTML &amp; CSS</div>
+          <div class="skill-item"><div class="skill-dot"></div>Python (basic)</div>
+          <div class="skill-item"><div class="skill-dot"></div>Microsoft Excel</div>
+          <div class="skill-item"><div class="skill-dot"></div>Microsoft Word &amp; PowerPoint</div>
+          <div class="skill-item"><div class="skill-dot"></div>Google Workspace</div>
+        </div>
+      </div>
+
+      <!-- ✏️ SKILL GROUP 2 -->
+      <div class="reveal reveal-delay-2">
+        <h3 class="skill-group-title">Design &amp; Tools</h3>
+        <div class="skill-list">
+          <div class="skill-item"><div class="skill-dot"></div>Canva</div>
+          <div class="skill-item"><div class="skill-dot"></div>Adobe Photoshop (basic)</div>
+          <div class="skill-item"><div class="skill-dot"></div>Windows &amp; macOS</div>
+        </div>
+      </div>
+
+      <!-- ✏️ SKILL GROUP 3 -->
+      <div class="reveal reveal-delay-3">
+        <h3 class="skill-group-title">Thinking</h3>
+        <div class="skill-list">
+          <div class="skill-item"><div class="skill-dot"></div>Problem Solving</div>
+          <div class="skill-item"><div class="skill-dot"></div>Teamwork &amp; Collaboration</div>
+          <div class="skill-item"><div class="skill-dot"></div>Quick Learner</div>
+          <div class="skill-item"><div class="skill-dot"></div>Leadership</div>
+          <div class="skill-item"><div class="skill-dot"></div>Typing — 50 WPM</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     JOURNEY  (Activities + Achievements only)
+     ✏️ Add/remove .timeline-item blocks to update
+════════════════════════════════════════════════════════ -->
+<section id="journey" class="section-alt">
+  <div class="journey-inner">
+    <div class="journey-header reveal">
+      <span class="section-eyebrow">Activities &amp; Achievements</span>
+      <h2 class="section-h2">The Journey</h2>
+    </div>
+
+    <div class="timeline">
+
+      <!-- ✏️ TIMELINE ITEM 1 — most impactful first -->
+      <div class="timeline-item reveal">
+        <div class="timeline-dot"></div>
+        <div class="timeline-year">2026</div>
+        <div class="timeline-role">Campus Ambassador</div>
+        <div class="timeline-place">IAOC National Math Olympiad 2026</div>
+        <p class="timeline-desc">
+          Recognised for leadership, commitment, and contribution. Actively promoted
+          student participation and represented my college at a national level.
+        </p>
+        <span class="timeline-badge">🏅 National Recognition</span>
+        <!-- ✏️ CERTIFICATE LINK — name your cert image "campus-ambassador-cert.jpg"
+             and place it in the same folder as this HTML file -->
+        <div>
+          <span class="cert-link" onclick="openLightbox()">
+            <span class="cert-link-icon">📜</span> View Certificate
+          </span>
+        </div>
+      </div>
+
+      <!-- ✏️ TIMELINE ITEM 2 -->
+      <div class="timeline-item reveal">
+        <div class="timeline-dot"></div>
+        <div class="timeline-year">Ongoing</div>
+        <div class="timeline-role">Organiser — Inter-school Quiz Competition</div>
+        <div class="timeline-place">School Initiative</div>
+        <p class="timeline-desc">
+          Coordinated participants and managed on-day logistics for an inter-school
+          quiz competition. Earned a Certificate of Participation.
+        </p>
+        <span class="timeline-badge">📜 Certificate of Participation</span>
+      </div>
+
+      <!-- ✏️ TIMELINE ITEM 3 -->
+      <div class="timeline-item reveal">
+        <div class="timeline-dot"></div>
+        <div class="timeline-year">Ongoing</div>
+        <div class="timeline-role">Member — Computer Club</div>
+        <div class="timeline-place">Chattogram Collegiate College</div>
+        <p class="timeline-desc">
+          Participated in peer learning sessions and school tech initiatives, contributing
+          to a community of students passionate about technology.
+        </p>
+      </div>
+
+      <!-- ✏️ TIMELINE ITEM 4 -->
+      <div class="timeline-item reveal">
+        <div class="timeline-dot"></div>
+        <div class="timeline-year">Ongoing</div>
+        <div class="timeline-role">Volunteer — Peer Tutoring</div>
+        <div class="timeline-place">School Initiative</div>
+        <p class="timeline-desc">
+          Taught basic computer skills to classmates, reinforcing my own knowledge
+          while helping others bridge the digital gap.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     CONTACT
+     ✏️ Edit email, phone, GitHub, LinkedIn below
+════════════════════════════════════════════════════════ -->
+<section id="contact">
+  <div class="contact-inner">
+
+    <!-- left: text + links -->
+    <div class="reveal reveal-x">
+      <!-- ✏️ heading -->
+      <h2 class="contact-h2">Let's Build<br/><em>Something</em> New.</h2>
+      <p class="contact-sub">
+        Whether you have an opportunity, a project, or just want to say hi —
+        I'm always open to meaningful conversations.
+      </p>
+
+      <!-- ✏️ EMAIL — change email address here -->
+      <a href="mailto:safin.yasir11@gmail.com" class="contact-link">
+        <div class="contact-link-icon">✉️</div>
+        safin.yasir11@gmail.com
+      </a>
+
+      <!-- ✏️ PHONE — change phone number here -->
+      <a href="tel:+8801884275906" class="contact-link">
+        <div class="contact-link-icon">📞</div>
+        +8801884-275906
+      </a>
+
+      <!-- ✏️ SOCIAL BUTTONS
+           Replace YOUR_GITHUB_USERNAME with your GitHub username
+           Replace YOUR_LINKEDIN_URL with your LinkedIn profile slug -->
+      <div class="social-row">
+        <a href="https://github.com/YOUR_GITHUB_USERNAME" target="_blank" class="social-btn">
+          ⌥ GitHub
+          <span class="social-edit-hint">← add username</span>
+        </a>
+        <a href="https://linkedin.com/in/YOUR_LINKEDIN_URL" target="_blank" class="social-btn">
+          ◈ LinkedIn
+          <span class="social-edit-hint">← add profile</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- right: CV download card -->
+    <div class="reveal reveal-delay-2">
+      <div class="cv-card glass">
+        <div class="cv-card-glow"></div>
+        <div class="cv-card-title">Download My CV</div>
+        <p class="cv-card-sub">
+          Want the full picture? Grab my CV — it covers my education,
+          skills, projects, and everything in between.
+        </p>
+        <!-- ✏️ CV DOWNLOAD — replace YOUR_CV_FILE.pdf with your actual CV file path/link -->
+        <a href="MY_CV.pdf" download class="btn-download">
+          ⬇ Download CV
+        </a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     CERTIFICATE LIGHTBOX OVERLAY
+     ✏️ Name your cert image "campus-ambassador-cert.jpg"
+     and place it in the same folder — it will appear here
+════════════════════════════════════════════════════════ -->
+<div class="lightbox-overlay" id="certLightbox" onclick="closeLightboxOutside(event)">
+  <div class="lightbox-inner">
+    <button class="lightbox-close" onclick="closeLightbox()" aria-label="Close">&times;</button>
+    <img
+      src="campus-ambassador-cert.jpg"
+      alt="Campus Ambassador Certificate — IAOC National Math Olympiad 2026"
+      onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+    />
+    <!-- shown if cert image not found -->
+    <div class="lightbox-placeholder" style="display:none;">
+      <div style="font-size:3rem;margin-bottom:1rem;">📜</div>
+      Certificate image not found.<br/>
+      <strong>✏️ Place your cert as "campus-ambassador-cert.jpg" in the same folder</strong>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     FOOTER
+     ✏️ Edit footer text and links here
+════════════════════════════════════════════════════════ -->
+<footer>
+  <p>© <span id="year"></span> Safin Yasar · Built with precision and soul · Chattogram, Bangladesh</p>
+  <div class="footer-links">
+    <a href="#about">About</a>
+    <a href="#education">Education</a>
+    <a href="#projects">Work</a>
+    <a href="#contact">Contact</a>
+  </div>
+</footer>
+
+<!-- ══════════════════════════════════════════════════════
+     SCRIPTS — no need to edit these unless you want to
+     change behaviour
+════════════════════════════════════════════════════════ -->
+<script>
+  // ── Auto year in footer
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // ── Navbar scroll effect
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  // ── Smooth scroll for ALL anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(link => {
+    link.addEventListener('click', function(e) {
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        const top = target.getBoundingClientRect().top + window.scrollY - 80;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+    });
+  });
+
+  // ══════════════════════════════════════════════════════
+  // THEME TOGGLE — dark / light mode
+  // ✏️ To start in light mode by default, change 'dark' to 'light' below
+  // ══════════════════════════════════════════════════════
+  const html = document.documentElement;
+  const toggleBtn = document.getElementById('themeToggle');
+  const savedTheme = localStorage.getItem('sy-theme') || 'dark';
+  if (savedTheme === 'light') html.classList.add('light');
+
+  toggleBtn.addEventListener('click', () => {
+    html.classList.toggle('light');
+    localStorage.setItem('sy-theme', html.classList.contains('light') ? 'light' : 'dark');
+  });
+
+  // ══════════════════════════════════════════════════════
+  // CERTIFICATE LIGHTBOX
+  // ✏️ Name your cert "campus-ambassador-cert.jpg", same folder as this file
+  // ══════════════════════════════════════════════════════
+  const lightbox = document.getElementById('certLightbox');
+
+  function openLightbox() {
+    lightbox.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox() {
+    lightbox.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  function closeLightboxOutside(e) {
+    if (e.target === lightbox) closeLightbox();
+  }
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeLightbox();
+  });
+
+  // ── Scroll reveal observer
+  const revealEls = document.querySelectorAll('.reveal, .reveal-x');
+  const revealObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        revealObs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  revealEls.forEach(el => revealObs.observe(el));
+</script>
+</body>
+</html>
